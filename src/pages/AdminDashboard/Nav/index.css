@@ -1,0 +1,25 @@
+.navbar {
+  background-color: #bbbbbb;
+  padding: 10px;
+}
+
+.nav-list {
+  list-style-type: none;
+}
+
+.nav-item {
+  padding: 10px;
+  background-color: white;
+  border-radius: 10px;
+}
+
+.nav-item a {
+  text-decoration: none;
+  color: black;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.nav-item a:hover {
+  color: lightgray;
+}
