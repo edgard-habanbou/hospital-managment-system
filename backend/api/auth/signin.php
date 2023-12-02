@@ -1,12 +1,14 @@
 <?php
 
-use Firebase\JWT\JWT;
 
 header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Headers: Content-Type');
 include('../../config/connection.php');
+$json_data = file_get_contents("php://input");
+$data = json_decode($json_data, true);
 
-$user_email = $_POST['user_email'];
-$user_password = $_POST['user_password'];
+$user_email = $data['user_email'];
+$user_password = $data['user_password'];
 
 $query = $con->prepare('SELECT user_id , fname, lname, user_password, role_id  FROM tbl_users WHERE user_email = ?');
 $query->bind_param('s', $user_email);
