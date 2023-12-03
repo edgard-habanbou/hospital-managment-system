@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import "./styles.css";
 
-const Table = ({ header_data, row_data, onDelete, onEdit, slice }) => {
+const Table = ({ header_data, row_data, onDelete, onEdit, onAdd, slice }) => {
   const [editIndex, setEditIndex] = useState(-1);
   const [editedRow, setEditedRow] = useState({});
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newRow, setNewRow] = useState({});
 
   const handleEditClick = (rowDataItem, rowIndex) => {
     setEditIndex(rowIndex);
@@ -20,10 +22,29 @@ const Table = ({ header_data, row_data, onDelete, onEdit, slice }) => {
     setEditIndex(-1);
     setEditedRow({});
   };
+
   const handleCancelClick = () => {
     setEditIndex(-1);
     setEditedRow({});
+    setShowAddForm(false);
+    setNewRow({});
   };
+
+  const handleAddClick = () => {
+    setShowAddForm(true);
+    setNewRow({});
+  };
+
+  const handleAddSaveClick = () => {
+    // Add validation if needed
+    const updatedRowData = [newRow];
+    onAdd(updatedRowData[0]);
+    setNewRow({});
+    setShowAddForm(false);
+    // Pass the updated data to the parent component or handle it as needed
+  };
+
+  const handleAddCancelClick = () => {};
 
   return (
     <div className="table-wrapper">
@@ -77,24 +98,62 @@ const Table = ({ header_data, row_data, onDelete, onEdit, slice }) => {
                 ) : (
                   <div className="flex gap">
                     <button
-                      className="btn danger"
-                      onClick={() => onDelete(rowDataItem)}
-                    >
-                      Delete
-                    </button>
-                    <button
                       className="btn"
                       onClick={() => handleEditClick(rowDataItem, rowIndex)}
                     >
                       Edit
+                    </button>
+                    <button
+                      className="btn danger"
+                      onClick={() => onDelete(rowDataItem)}
+                    >
+                      Delete
                     </button>
                   </div>
                 )}
               </td>
             </tr>
           ))}
+          {showAddForm && (
+            <tr>
+              {Object.keys(row_data[0])
+                .slice(slice)
+                .map((key, colIndex) => (
+                  <td key={colIndex}>
+                    <input
+                      className="input"
+                      type="text"
+                      value={newRow[key] || ""}
+                      onChange={(e) =>
+                        setNewRow({
+                          ...newRow,
+                          [key]: e.target.value,
+                        })
+                      }
+                    />
+                  </td>
+                ))}
+              <td>
+                <div className="flex gap">
+                  <button className="btn" onClick={handleAddSaveClick}>
+                    Save
+                  </button>
+                  <button className="btn danger" onClick={handleCancelClick}>
+                    Cancel
+                  </button>
+                </div>
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
+      {!showAddForm && (
+        <div className="add-button-container">
+          <button className="btn" onClick={handleAddClick}>
+            Add
+          </button>
+        </div>
+      )}
     </div>
   );
 };
