@@ -67,7 +67,12 @@ if ($data['action'] == 'update') {
     $username = $data['data']['username'];
     $fname = $data['data']['fname'];
     $lname =  $data['data']['lname'];
-    $role_id = $data['data']['role_id'];
+    $role_name = $data['data']['role_name'];
+    if (strtolower($role_name) == 'admin') {
+        $role_id = 1;
+    } else {
+        $role_id = 2;
+    }
     $user_email = $data['data']['user_email'];
     $gender_id = $data['data']['gender_id'];
     $gender_name = $data['data']['gender_name'];

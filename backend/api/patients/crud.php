@@ -30,8 +30,11 @@ if ($data['action'] == "create") {
     }
     $phone_number = $data['data']['phone_number'];
     $query = $con->prepare('INSERT INTO tbl_patient (fname, lname, dob, gender_id, phone_number,patient_room ) VALUES (?, ?, ?, ?, ?, ?)');
+    $query_room = $con->prepare('UPDATE `tbl_rooms` SET `availability_status` = 0 WHERE `tbl_rooms`.`room_number` = ?;');
+    $query_room->bind_param('i',  $patient_room);
     $query->bind_param('sssiii', $fname, $lname, $dob, $gender_id, $phone_number, $patient_room);
     $query->execute();
+    $query_room->execute();
 
     $response = [];
 
@@ -62,8 +65,11 @@ if ($data['action'] == 'update') {
     $phone_number = $data['data']['phone_number'];
     $patient_id = $data['data']['patient_id'];
     $query = $con->prepare('UPDATE tbl_patient SET  fname = ?, lname = ?, dob = ?, gender_id = ?, phone_number = ?, patient_room = ? WHERE patient_id = ?');
+    $query_room = $con->prepare('UPDATE `tbl_rooms` SET `availability_status` = 0 WHERE `tbl_rooms`.`room_number` = ?;');
+    $query_room->bind_param('i',  $patient_room);
     $query->bind_param('sssiiis', $fname, $lname, $dob, $gender_id, $phone_number, $patient_room,  $patient_id);
     $query->execute();
+    $query_room->execute();
     if ($query->error) {
         $response['status'] = false;
         $response['message'] = 'Error updating user: ' . $query->error;

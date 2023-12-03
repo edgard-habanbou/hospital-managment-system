@@ -96,7 +96,7 @@ const Table = ({
                       value
                     )}
                     {editIndex === rowIndex ? (
-                      room_data.length > 0 && key === "patient_room" ? (
+                      room_data?.length > 0 && key === "patient_room" ? (
                         <select
                           className="input"
                           value={

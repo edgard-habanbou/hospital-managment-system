@@ -3,17 +3,22 @@ import Nav from "./Nav";
 import Table from "./Table";
 import { axiosPost } from "../../Assets/api";
 
+const API_BASE_URL = "http://localhost/hospital-managment-system/backend/api";
+const USERS_API_URL = `${API_BASE_URL}/users/crud.php`;
+const PATIENTS_API_URL = `${API_BASE_URL}/patients/crud.php`;
+
 const AdminDashboard = () => {
   const [showDoctorsTable, setShowDoctorsTable] = useState(false);
   const [doctorsData, setDoctorsData] = useState(null);
-  const [ShowPatientsTable, setShowPatientsTable] = useState(false);
-  const [PatientsData, setPatientsData] = useState(null);
+  const [showPatientsTable, setShowPatientsTable] = useState(false);
+  const [patientsData, setPatientsData] = useState(null);
 
   const handleDoctorsClick = () => {
     setShowDoctorsTable(true);
     setShowPatientsTable(false);
     getDoctorsData();
   };
+
   const handlePatientsClick = () => {
     setShowDoctorsTable(false);
     setShowPatientsTable(true);
@@ -21,50 +26,76 @@ const AdminDashboard = () => {
   };
 
   const getDoctorsData = () => {
-    axiosPost(
-      "http://localhost/hospital-managment-system/backend/api/users/crud.php",
-      "getAllUsers",
-      null,
-      null
-    )
-      .then((res) => {
-        setDoctorsData(res.data);
-      })
-      .catch((err) => console.log(err));
+    fetchData(USERS_API_URL, "getAllUsers", null, setDoctorsData);
   };
+
   const getPatientsData = () => {
-    const url =
-      "http://localhost/hospital-managment-system/backend/api/patients/crud.php";
-    axiosPost(url, "getAllPatients", null, null)
+    fetchData(PATIENTS_API_URL, "getAllPatients", null, setPatientsData);
+  };
+
+  const fetchData = (url, action, key, setData) => {
+    axiosPost(url, action, key, null)
       .then((res) => {
-        setPatientsData(res.data);
+        setData(res.data);
       })
       .catch((err) => console.log(err));
   };
 
   const handleUserDelete = (rowDataItem) => {
-    axiosPost(
-      "http://localhost/hospital-managment-system/backend/api/users/crud.php",
-      "delete",
-      "user_id",
-      rowDataItem.user_id
-    ).then((res) => {
-      getDoctorsData();
-    });
+    handleDelete(USERS_API_URL, "delete", "user_id", rowDataItem);
   };
+
   const handlePatientDelete = (rowDataItem) => {
-    axiosPost(
-      "http://localhost/hospital-managment-system/backend/api/patients/crud.php",
-      "delete",
-      "patient_id",
-      rowDataItem.patient_id
-    ).then((res) => {
-      getPatientsData();
+    handleDelete(PATIENTS_API_URL, "delete", "patient_id", rowDataItem);
+  };
+
+  const handleDelete = (url, action, key, rowDataItem) => {
+    axiosPost(url, action, key, rowDataItem[key]).then((res) => {
+      if (url === USERS_API_URL) {
+        getDoctorsData();
+      } else if (url === PATIENTS_API_URL) {
+        getPatientsData();
+      }
     });
   };
+
+  const handleuserEdit = (rowDataItem) => {
+    handleEdit(USERS_API_URL, "update", "data", rowDataItem, getDoctorsData);
+  };
+
+  const handlePatientEdit = (rowDataItem) => {
+    handleEdit(
+      PATIENTS_API_URL,
+      "update",
+      "data",
+      rowDataItem,
+      getPatientsData
+    );
+  };
+
+  const handleEdit = (url, action, key, rowDataItem, getData) => {
+    axiosPost(url, action, key, rowDataItem).then((res) => {
+      getData();
+    });
+  };
+
+  const handleDoctorsAdd = (rowDataItem) => {
+    handleAdd(USERS_API_URL, "create", "data", rowDataItem, getDoctorsData);
+  };
+
+  const handlePatientAdd = (rowDataItem) => {
+    handleAdd(PATIENTS_API_URL, "create", "data", rowDataItem, getPatientsData);
+  };
+
+  const handleAdd = (url, action, key, rowDataItem, getData) => {
+    axiosPost(url, action, key, rowDataItem).then((res) => {
+      getData();
+    });
+  };
+
   const er_confirmation = (rowDataItem, answer) => {
     axiosPost(
-      "http://localhost/hospital-managment-system/backend/api/patients/crud.php",
+      PATIENTS_API_URL,
       "er_confirmation",
       "patient_id",
       rowDataItem.patient_id,
@@ -73,47 +104,7 @@ const AdminDashboard = () => {
       getPatientsData();
     });
   };
-  const handleuserEdit = (rowDataItem) => {
-    axiosPost(
-      "http://localhost/hospital-managment-system/backend/api/users/crud.php",
-      "update",
-      "data",
-      rowDataItem
-    ).then((res) => {
-      getDoctorsData();
-    });
-  };
-  const handleDoctorsAdd = (rowDataItem) => {
-    axiosPost(
-      "http://localhost/hospital-managment-system/backend/api/users/crud.php",
-      "create",
-      "data",
-      rowDataItem
-    ).then((res) => {
-      getDoctorsData();
-    });
-  };
-  const handlePatientAdd = (rowDataItem) => {
-    axiosPost(
-      "http://localhost/hospital-managment-system/backend/api/patients/crud.php",
-      "create",
-      "data",
-      rowDataItem
-    ).then((res) => {
-      getPatientsData();
-    });
-  };
 
-  const handlePatientEdit = (rowDataItem) => {
-    axiosPost(
-      "http://localhost/hospital-managment-system/backend/api/patients/crud.php",
-      "update",
-      "data",
-      rowDataItem
-    ).then((res) => {
-      getPatientsData();
-    });
-  };
   return (
     <div>
       <Nav
@@ -125,7 +116,7 @@ const AdminDashboard = () => {
         <h1>
           {showDoctorsTable
             ? "Doctors"
-            : ShowPatientsTable
+            : showPatientsTable
             ? "Patients"
             : "Admin Dashboard"}
         </h1>
@@ -139,11 +130,11 @@ const AdminDashboard = () => {
             slice={4}
           />
         )}
-        {ShowPatientsTable && PatientsData && (
+        {showPatientsTable && patientsData && (
           <Table
-            header_data={PatientsData.header_data}
-            row_data={PatientsData.patients}
-            room_data={PatientsData.rooms}
+            header_data={patientsData.header_data}
+            row_data={patientsData.patients}
+            room_data={patientsData.rooms}
             onDelete={handlePatientDelete}
             onEdit={handlePatientEdit}
             onAdd={handlePatientAdd}
