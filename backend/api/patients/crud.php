@@ -22,14 +22,15 @@ if ($data['action'] == "create") {
     $lname =  $data['data']['lname'];
     $dob = $data['data']['dob'];
     $gender_name = $data['data']['gender_name'];
+    $patient_room = $data['data']['patient_room'];
     if (strtolower($gender_name) == 'male') {
         $gender_id = 1;
     } else {
         $gender_id = 2;
     }
     $phone_number = $data['data']['phone_number'];
-    $query = $con->prepare('INSERT INTO tbl_patient (fname, lname, dob, gender_id, phone_number) VALUES (?, ?, ?, ?, ?)');
-    $query->bind_param('sssii', $fname, $lname, $dob, $gender_id, $phone_number);
+    $query = $con->prepare('INSERT INTO tbl_patient (fname, lname, dob, gender_id, phone_number,patient_room ) VALUES (?, ?, ?, ?, ?, ?)');
+    $query->bind_param('sssiii', $fname, $lname, $dob, $gender_id, $phone_number, $patient_room);
     $query->execute();
 
     $response = [];
@@ -52,6 +53,7 @@ if ($data['action'] == 'update') {
     $dob = $data['data']['dob'];
     $gender_id = $data['data']['gender_id'];
     $gender_name = $data['data']['gender_name'];
+    $patient_room = $data['data']['patient_room'];
     if ($gender_name == 'Male') {
         $gender_id = 1;
     } else {
@@ -59,8 +61,8 @@ if ($data['action'] == 'update') {
     }
     $phone_number = $data['data']['phone_number'];
     $patient_id = $data['data']['patient_id'];
-    $query = $con->prepare('UPDATE tbl_patient SET  fname = ?, lname = ?, dob = ?, gender_id = ?, phone_number = ? WHERE patient_id = ?');
-    $query->bind_param('sssiii', $fname, $lname, $dob, $gender_id, $phone_number, $patient_id);
+    $query = $con->prepare('UPDATE tbl_patient SET  fname = ?, lname = ?, dob = ?, gender_id = ?, phone_number = ?, patient_room = ? WHERE patient_id = ?');
+    $query->bind_param('sssiiis', $fname, $lname, $dob, $gender_id, $phone_number, $patient_room,  $patient_id);
     $query->execute();
     if ($query->error) {
         $response['status'] = false;
@@ -86,17 +88,25 @@ if ($data['action'] == 'delete') {
     echo json_encode($response);
 }
 if ($data['action'] == 'getAllPatients') {
-    $query = $con->prepare('SELECT pat.patient_id, pat.gender_id, pat.need_emergency, pat.fname, pat.lname, pat.dob, pat.phone_number, gender.gender_name FROM `tbl_patient` pat JOIN `tbl_gender` gender ON pat.`gender_id` = gender.`gender_id`');
+    $query = $con->prepare('SELECT pat.patient_id, pat.gender_id, pat.need_emergency, pat.fname, pat.lname, pat.dob, pat.phone_number,pat.patient_room, gender.gender_name FROM `tbl_patient` pat JOIN `tbl_gender` gender ON pat.`gender_id` = gender.`gender_id`');
+    $query_rooms = $con->prepare('SELECT * FROM tbl_rooms WHERE availability_status = 1');
     $query->execute();
     $result = $query->get_result();
+    $query_rooms->execute();
+    $result_rooms = $query_rooms->get_result();
     $patients = [];
+    $rooms = [];
     while ($row = $result->fetch_assoc()) {
-        array_push($patients, $row);
+        $patients[] =  $row;
+    }
+    while ($row = $result_rooms->fetch_assoc()) {
+        $rooms[] =  $row;
     }
     $response['status'] = true;
     $response['message'] = 'Patients fetched successfully';
-    $response['header_data'] = ["First Name", "Last Name", "Date Of Birth", "Phone Number", "Gender"];
+    $response['header_data'] = ["First Name", "Last Name", "Date Of Birth", "Phone Number", "Room", "Gender"];
     $response['patients'] = $patients;
+    $response['rooms'] = $rooms;
     header('Content-Type: application/json');
     echo json_encode($response);
 }

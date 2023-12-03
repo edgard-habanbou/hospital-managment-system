@@ -143,6 +143,7 @@ const AdminDashboard = () => {
           <Table
             header_data={PatientsData.header_data}
             row_data={PatientsData.patients}
+            room_data={PatientsData.rooms}
             onDelete={handlePatientDelete}
             onEdit={handlePatientEdit}
             onAdd={handlePatientAdd}

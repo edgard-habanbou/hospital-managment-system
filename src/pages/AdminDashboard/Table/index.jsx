@@ -4,6 +4,7 @@ import "./styles.css";
 const Table = ({
   header_data,
   row_data,
+  room_data,
   onDelete,
   onEdit,
   onAdd,
@@ -77,12 +78,12 @@ const Table = ({
                 .slice(slice)
                 .map(([key, value], colIndex) => (
                   <td key={colIndex}>
-                    {editIndex === rowIndex ? (
+                    {editIndex === rowIndex && key !== "patient_room" ? (
                       <input
                         className="input"
                         type="text"
                         value={
-                          editedRow[key] !== undefined ? editedRow[key] : value
+                          editedRow[key] !== null ? editedRow[key] : value || ""
                         }
                         onChange={(e) =>
                           setEditedRow({
@@ -93,6 +94,34 @@ const Table = ({
                       />
                     ) : (
                       value
+                    )}
+                    {editIndex === rowIndex ? (
+                      room_data.length > 0 && key === "patient_room" ? (
+                        <select
+                          className="input"
+                          value={
+                            editedRow[key] !== null
+                              ? editedRow[key]
+                              : value || ""
+                          }
+                          onChange={(e) =>
+                            setEditedRow({
+                              ...editedRow,
+                              [key]: e.target.value,
+                            })
+                          }
+                        >
+                          {room_data.map((room, index) => (
+                            <option key={index} value={room.room_number}>
+                              {room.room_number}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        ""
+                      )
+                    ) : (
+                      ""
                     )}
                   </td>
                 ))}
@@ -152,21 +181,42 @@ const Table = ({
                     ? slice - 1
                     : slice
                 )
-                .map((key, colIndex) => (
-                  <td key={colIndex}>
-                    <input
-                      className="input"
-                      type="text"
-                      value={newRow[key] || ""}
-                      onChange={(e) =>
-                        setNewRow({
-                          ...newRow,
-                          [key]: e.target.value,
-                        })
-                      }
-                    />
-                  </td>
-                ))}
+                .map((key, colIndex) =>
+                  key !== "patient_room" ? (
+                    <td key={colIndex}>
+                      <input
+                        className="input"
+                        type="text"
+                        value={newRow[key] || ""}
+                        onChange={(e) =>
+                          setNewRow({
+                            ...newRow,
+                            [key]: e.target.value,
+                          })
+                        }
+                      />
+                    </td>
+                  ) : (
+                    <td key={colIndex}>
+                      <select
+                        className="input"
+                        value={newRow[key]}
+                        onChange={(e) =>
+                          setNewRow({
+                            ...newRow,
+                            [key]: e.target.value,
+                          })
+                        }
+                      >
+                        {room_data.map((room, index) => (
+                          <option key={index} value={room.room_number}>
+                            {room.room_number}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                  )
+                )}
               <td>
                 <div className="flex gap">
                   <button className="btn" onClick={handleAddSaveClick}>
