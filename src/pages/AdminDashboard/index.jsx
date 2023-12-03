@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import Nav from "./Nav";
-import Table from "./Table";
+import React, { useState, useEffect } from "react";
+import Nav from "./components/Nav";
+import Table from "./components/Table";
 import { axiosPost } from "../../Assets/api";
 
 const API_BASE_URL = "http://localhost/hospital-managment-system/backend/api";
@@ -104,7 +104,9 @@ const AdminDashboard = () => {
       getPatientsData();
     });
   };
-
+  useEffect(() => {
+    document.title = "Admin Dashboard";
+  }, []);
   return (
     <div>
       <Nav
