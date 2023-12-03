@@ -3,6 +3,10 @@
   padding: 0;
   box-sizing: border-box;
 }
+.danger {
+  background-color: red !important;
+  color: #fff;
+}
 .flex {
   display: flex;
 }
@@ -22,8 +26,14 @@
 .full-width {
   width: 100vw;
 }
+.text-center {
+  text-align: center;
+}
 .right {
   justify-content: flex-end;
+}
+.wrap {
+  flex-wrap: wrap;
 }
 .space-between {
   justify-content: space-between;
@@ -33,7 +43,7 @@
 }
 
 .gap {
-  gap: 1rem;
+  gap: 10px;
 }
 .mt-2 {
   margin-top: 2rem;
@@ -53,7 +63,12 @@
   font-weight: 400;
   color: var(--txt-color);
 }
-
+.btn {
+  padding: 0.5rem 0.7rem;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+}
 .input input {
   padding: 11px;
   border: none;

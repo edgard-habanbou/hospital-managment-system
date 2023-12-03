@@ -1,4 +1,7 @@
 <?php
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Headers: Content-Type');
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     $response = [];
     $response['status'] = false;
@@ -8,21 +11,21 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-header('Access-Control-Allow-Origin: *');
 include('../../config/connection.php');
 
-
+$json_data = file_get_contents("php://input");
+$data = json_decode($json_data, true);
 // if (isset($_SESSION) && $_SESSION['role_id'] == 1) {
 
 
-if ($_POST['action'] == "create") {
-    $username = $_POST['username'];
-    $fname = $_POST['fname'];
-    $lname =  $_POST['lname'];
-    $role_id = $_POST['role_id'];
-    $user_email = $_POST['user_email'];
-    $gender_id = $_POST['gender_id'];
-    $user_password = $_POST['user_password'];
+if ($data['action'] == "create") {
+    $username = $data['username'];
+    $fname = $data['fname'];
+    $lname =  $data['lname'];
+    $role_id = $data['role_id'];
+    $user_email = $data['user_email'];
+    $gender_id = $data['gender_id'];
+    $user_password = $data['user_password'];
     $hashed_password = password_hash($user_password, PASSWORD_DEFAULT);
     $query = $con->prepare('INSERT INTO tbl_users (username, fname, lname, role_id, user_email, gender_id, user_password) VALUES (?, ?, ?, ?, ?, ?, ?)');
     $query->bind_param('sssisis', $username, $fname, $lname, $role_id, $user_email, $gender_id, $hashed_password);
@@ -41,15 +44,15 @@ if ($_POST['action'] == "create") {
         echo json_encode($response);
     }
 }
-if ($_POST['action'] == 'update') {
-    $username = $_POST['username'];
-    $fname = $_POST['fname'];
-    $lname =  $_POST['lname'];
-    $role_id = $_POST['role_id'];
-    $user_email = $_POST['user_email'];
-    $gender_id = $_POST['gender_id'];
-    $user_password = $_POST['user_password'];
-    $user_id = $_POST['user_id'];
+if ($data['action'] == 'update') {
+    $username = $data['username'];
+    $fname = $data['fname'];
+    $lname =  $data['lname'];
+    $role_id = $data['role_id'];
+    $user_email = $data['user_email'];
+    $gender_id = $data['gender_id'];
+    $user_password = $data['user_password'];
+    $user_id = $data['user_id'];
 
     $hashed_password = password_hash($user_password, PASSWORD_DEFAULT);
     $query = $con->prepare('UPDATE tbl_users SET username = ?, fname = ?, lname = ?, role_id = ?, user_email = ?,  gender_id = ?, user_password = ? WHERE user_id = ?');
@@ -67,8 +70,8 @@ if ($_POST['action'] == 'update') {
         echo json_encode($response);
     }
 }
-if ($_POST['action'] == 'delete') {
-    $user_id = $_POST['user_id'];
+if ($data['action'] == 'delete') {
+    $user_id = $data['user_id'];
     $query = $con->prepare('DELETE FROM tbl_users WHERE user_id = ?');
     $query->bind_param('i', $user_id);
     $query->execute();
@@ -86,8 +89,8 @@ if ($_POST['action'] == 'delete') {
         echo json_encode($response);
     }
 }
-if ($_POST['action'] == 'getAllUsers') {
-    $query = $con->prepare('SELECT * FROM tbl_users');
+if ($data['action'] == 'getAllUsers') {
+    $query = $con->prepare('SELECT user.`username`, user.`fname`, user.`lname`, user.`user_email`, role.`role_name`, gender.`gender_name` FROM tbl_users user JOIN tbl_roles role ON user.`role_id` = role.`role_id` JOIN tbl_gender gender ON user.`gender_id` = gender.`gender_id`;');
     $query->execute();
 
     if ($query->error) {
@@ -103,13 +106,14 @@ if ($_POST['action'] == 'getAllUsers') {
         }
         $response['status'] = true;
         $response['message'] = 'Users fetched successfully';
+        $response['header_data'] = ["Username", "First Name", "Last Name", "Email", "Role", "Gender"];
         $response['users'] = $users;
         header('Content-Type: application/json');
         echo json_encode($response);
     }
 }
-if ($_POST['action'] == 'getUserById') {
-    $user_id = $_POST['user_id'];
+if ($data['action'] == 'getUserById') {
+    $user_id = $data['user_id'];
     $query = $con->prepare('SELECT * FROM tbl_users WHERE user_id = ?');
     $query->bind_param('i', $user_id);
     $query->execute();
@@ -125,8 +129,8 @@ if ($_POST['action'] == 'getUserById') {
 
         $response['status'] = true;
         $response['message'] = 'User fetched successfully';
+        $response['header_data'] = ["Username", "First Name", "Last Name", "Email", "Role", "Gender"];
         $response['user'] = $user;
-
         header('Content-Type: application/json');
         echo json_encode($response);
     }
