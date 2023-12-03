@@ -19,13 +19,13 @@ $data = json_decode($json_data, true);
 
 
 if ($data['action'] == "create") {
-    $username = $data['username'];
-    $fname = $data['fname'];
-    $lname =  $data['lname'];
-    $role_id = $data['role_id'];
-    $user_email = $data['user_email'];
-    $gender_id = $data['gender_id'];
-    $user_password = $data['user_password'];
+    $username = $data['data']['username'];
+    $fname = $data['data']['fname'];
+    $lname =  $data['data']['lname'];
+    $role_id = $data['data']['role_id'];
+    $user_email = $data['data']['user_email'];
+    $gender_id = $data['data']['gender_id'];
+    $user_password = $data['data']['user_password'];
     $hashed_password = password_hash($user_password, PASSWORD_DEFAULT);
     $query = $con->prepare('INSERT INTO tbl_users (username, fname, lname, role_id, user_email, gender_id, user_password) VALUES (?, ?, ?, ?, ?, ?, ?)');
     $query->bind_param('sssisis', $username, $fname, $lname, $role_id, $user_email, $gender_id, $hashed_password);
@@ -45,14 +45,14 @@ if ($data['action'] == "create") {
     }
 }
 if ($data['action'] == 'update') {
-    $username = $data['username'];
-    $fname = $data['fname'];
-    $lname =  $data['lname'];
-    $role_id = $data['role_id'];
-    $user_email = $data['user_email'];
-    $gender_id = $data['gender_id'];
-    $user_password = $data['user_password'];
-    $user_id = $data['user_id'];
+    $username = $data['data']['username'];
+    $fname = $data['data']['fname'];
+    $lname =  $data['data']['lname'];
+    $role_id = $data['data']['role_id'];
+    $user_email = $data['data']['user_email'];
+    $gender_id = $data['data']['gender_id'];
+    $user_password = $data['data']['user_password'];
+    $user_id = $data['data']['user_id'];
 
     $hashed_password = password_hash($user_password, PASSWORD_DEFAULT);
     $query = $con->prepare('UPDATE tbl_users SET username = ?, fname = ?, lname = ?, role_id = ?, user_email = ?,  gender_id = ?, user_password = ? WHERE user_id = ?');
@@ -90,7 +90,7 @@ if ($data['action'] == 'delete') {
     }
 }
 if ($data['action'] == 'getAllUsers') {
-    $query = $con->prepare('SELECT user.`username`, user.`fname`, user.`lname`, user.`user_email`, role.`role_name`, gender.`gender_name` FROM tbl_users user JOIN tbl_roles role ON user.`role_id` = role.`role_id` JOIN tbl_gender gender ON user.`gender_id` = gender.`gender_id`;');
+    $query = $con->prepare('SELECT  user.`user_id`, role.`role_id`, gender.`gender_id`, user.`user_password`, user.`username`, user.`fname`, user.`lname`, user.`user_email`, role.`role_name`, gender.`gender_name` FROM tbl_users user JOIN tbl_roles role ON user.`role_id` = role.`role_id` JOIN tbl_gender gender ON user.`gender_id` = gender.`gender_id`;');
     $query->execute();
 
     if ($query->error) {

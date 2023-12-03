@@ -18,11 +18,11 @@ $data = json_decode($json_data, true);
 
 
 if ($data['action'] == "create") {
-    $fname = $data['fname'];
-    $lname =  $data['lname'];
-    $dob = $data['dob'];
-    $gender_id = $data['gender_id'];
-    $phone_number = $data['phone_number'];
+    $fname = $data['data']['fname'];
+    $lname =  $data['data']['lname'];
+    $dob = $data['data']['dob'];
+    $gender_id = $data['data']['gender_id'];
+    $phone_number = $data['data']['phone_number'];
     $query = $con->prepare('INSERT INTO tbl_patient (fname, lname, dob, gender_id, phone_number) VALUES (?, ?, ?, ?, ?)');
     $query->bind_param('sssii', $fname, $lname, $dob, $gender_id, $phone_number);
     $query->execute();
@@ -42,12 +42,12 @@ if ($data['action'] == "create") {
     }
 }
 if ($data['action'] == 'update') {
-    $fname = $data['fname'];
-    $lname =  $data['lname'];
-    $dob = $data['dob'];
-    $gender_id = $data['gender_id'];
-    $phone_number = $data['phone_number'];
-    $patient_id = $data['patient_id'];
+    $fname = $data['data']['fname'];
+    $lname =  $data['data']['lname'];
+    $dob = $data['data']['dob'];
+    $gender_id = $data['data']['gender_id'];
+    $phone_number = $data['data']['phone_number'];
+    $patient_id = $data['data']['patient_id'];
     $query = $con->prepare('UPDATE tbl_patient SET  fname = ?, lname = ?, dob = ?, gender_id = ?, phone_number = ? WHERE patient_id = ?');
     $query->bind_param('sssiii', $fname, $lname, $dob, $gender_id, $phone_number, $patient_id);
     $query->execute();
@@ -75,7 +75,7 @@ if ($data['action'] == 'delete') {
     echo json_encode($response);
 }
 if ($data['action'] == 'getAllPatients') {
-    $query = $con->prepare('SELECT pat.fname, pat.lname, pat.dob, pat.phone_number, gender.gender_name FROM `tbl_patient` pat JOIN `tbl_gender` gender ON pat.`patient_id` = gender.`gender_name`');
+    $query = $con->prepare('SELECT pat.patient_id, pat.gender_id, pat.fname, pat.lname, pat.dob, pat.phone_number, gender.gender_name FROM `tbl_patient` pat JOIN `tbl_gender` gender ON pat.`gender_id` = gender.`gender_id`');
     $query->execute();
     $result = $query->get_result();
     $patients = [];
@@ -98,7 +98,6 @@ if ($data['action'] == 'getPatientById') {
     $patient = $result->fetch_assoc();
     $response['status'] = true;
     $response['message'] = 'Patient fetched successfully';
-    $response['data'] = $patient;
     header('Content-Type: application/json');
     echo json_encode($response);
 }

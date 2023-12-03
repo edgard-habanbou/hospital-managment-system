@@ -1,5 +1,5 @@
 import "./styles.css";
-const Table = ({ header_data, row_data }) => {
+const Table = ({ header_data, row_data, onDelete, onEdit, slice }) => {
   return (
     <div className="table-wrapper">
       <table className="table">
@@ -16,16 +16,25 @@ const Table = ({ header_data, row_data }) => {
         <tbody>
           {row_data.map((rowDataItem, rowIndex) => (
             <tr key={rowIndex}>
-              {Object.values(rowDataItem).map((item, colIndex) => (
-                <td key={colIndex}>{item}</td>
-              ))}
+              {Object.values(rowDataItem)
+                .slice(slice)
+                .map((item, colIndex) => (
+                  <td key={colIndex}>{item}</td>
+                ))}
               <td>
                 <div className="flex gap">
                   <div>
-                    <button className="btn danger">Delete</button>
+                    <button
+                      className="btn danger"
+                      onClick={() => onDelete(rowDataItem)}
+                    >
+                      Delete
+                    </button>
                   </div>
                   <div>
-                    <button className="btn">Edit</button>
+                    <button className="btn" onClick={() => onEdit(rowDataItem)}>
+                      Edit
+                    </button>
                   </div>
                 </div>
               </td>
