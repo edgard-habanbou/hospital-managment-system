@@ -51,6 +51,12 @@ if ($data['action'] == 'update') {
     $role_id = $data['data']['role_id'];
     $user_email = $data['data']['user_email'];
     $gender_id = $data['data']['gender_id'];
+    $gender_name = $data['data']['gender_name'];
+    if ($gender_name == 'Male') {
+        $gender_id = 1;
+    } else {
+        $gender_id = 2;
+    }
     $user_password = $data['data']['user_password'];
     $user_id = $data['data']['user_id'];
 

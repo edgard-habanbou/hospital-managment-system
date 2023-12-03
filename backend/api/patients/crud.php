@@ -46,6 +46,12 @@ if ($data['action'] == 'update') {
     $lname =  $data['data']['lname'];
     $dob = $data['data']['dob'];
     $gender_id = $data['data']['gender_id'];
+    $gender_name = $data['data']['gender_name'];
+    if ($gender_name == 'Male') {
+        $gender_id = 1;
+    } else {
+        $gender_id = 2;
+    }
     $phone_number = $data['data']['phone_number'];
     $patient_id = $data['data']['patient_id'];
     $query = $con->prepare('UPDATE tbl_patient SET  fname = ?, lname = ?, dob = ?, gender_id = ?, phone_number = ? WHERE patient_id = ?');

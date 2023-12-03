@@ -1,13 +1,13 @@
 import axios from "axios";
 
-export const axiosPost = (url, action, id_name, id) => {
+export const axiosPost = (url, action, postDataName, postData) => {
   return new Promise((resolve, reject) => {
     axios
       .post(
         url,
         {
           action: action,
-          [id_name]: id,
+          [postDataName]: postData,
         },
         {
           headers: {
@@ -16,7 +16,6 @@ export const axiosPost = (url, action, id_name, id) => {
         }
       )
       .then((response) => {
-        console.log(response);
         resolve(response);
       })
       .catch((error) => {

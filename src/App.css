@@ -51,17 +51,15 @@
 .txt-xl {
   font-size: 3rem;
   font-weight: 900;
-  color: var(--txt-color);
 }
 .txt-md {
   font-size: 1.5rem;
   font-weight: 400;
-  color: var(--txt-color);
 }
 .txt-sm {
   font-size: 1rem;
   font-weight: 400;
-  color: var(--txt-color);
+  color: #fff;
 }
 .btn {
   padding: 0.5rem 0.7rem;
@@ -69,14 +67,14 @@
   border: none;
   cursor: pointer;
 }
-.input input {
+.input {
   padding: 11px;
   border: none;
   border-radius: 10px;
-  color: var(--txt-color);
 
   background-color: #221f1fce;
-  width: 20rem;
+  color: #fff;
+  width: 10rem;
 }
 @media screen and (max-width: 1280px) {
   .txt-xl {

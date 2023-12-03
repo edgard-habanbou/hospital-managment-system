@@ -1,5 +1,30 @@
+import React, { useState } from "react";
 import "./styles.css";
+
 const Table = ({ header_data, row_data, onDelete, onEdit, slice }) => {
+  const [editIndex, setEditIndex] = useState(-1);
+  const [editedRow, setEditedRow] = useState({});
+
+  const handleEditClick = (rowDataItem, rowIndex) => {
+    setEditIndex(rowIndex);
+    setEditedRow({ ...rowDataItem });
+  };
+
+  const handleSaveClick = () => {
+    const updatedRowData = [...row_data];
+    updatedRowData[editIndex] = {
+      ...updatedRowData[editIndex],
+      ...editedRow,
+    };
+    onEdit(updatedRowData[editIndex]);
+    setEditIndex(-1);
+    setEditedRow({});
+  };
+  const handleCancelClick = () => {
+    setEditIndex(-1);
+    setEditedRow({});
+  };
+
   return (
     <div className="table-wrapper">
       <table className="table">
@@ -16,27 +41,55 @@ const Table = ({ header_data, row_data, onDelete, onEdit, slice }) => {
         <tbody>
           {row_data.map((rowDataItem, rowIndex) => (
             <tr key={rowIndex}>
-              {Object.values(rowDataItem)
+              {Object.entries(rowDataItem)
                 .slice(slice)
-                .map((item, colIndex) => (
-                  <td key={colIndex}>{item}</td>
+                .map(([key, value], colIndex) => (
+                  <td key={colIndex}>
+                    {editIndex === rowIndex ? (
+                      <input
+                        className="input"
+                        type="text"
+                        value={
+                          editedRow[key] !== undefined ? editedRow[key] : value
+                        }
+                        onChange={(e) =>
+                          setEditedRow({
+                            ...editedRow,
+                            [key]: e.target.value,
+                          })
+                        }
+                      />
+                    ) : (
+                      value
+                    )}
+                  </td>
                 ))}
               <td>
-                <div className="flex gap">
-                  <div>
+                {editIndex === rowIndex ? (
+                  <div className="flex gap">
+                    <button className="btn" onClick={handleSaveClick}>
+                      Save
+                    </button>
+                    <button className="btn danger" onClick={handleCancelClick}>
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex gap">
                     <button
                       className="btn danger"
                       onClick={() => onDelete(rowDataItem)}
                     >
                       Delete
                     </button>
-                  </div>
-                  <div>
-                    <button className="btn" onClick={() => onEdit(rowDataItem)}>
+                    <button
+                      className="btn"
+                      onClick={() => handleEditClick(rowDataItem, rowIndex)}
+                    >
                       Edit
                     </button>
                   </div>
-                </div>
+                )}
               </td>
             </tr>
           ))}
