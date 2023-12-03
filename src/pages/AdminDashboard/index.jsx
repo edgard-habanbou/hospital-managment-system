@@ -62,7 +62,17 @@ const AdminDashboard = () => {
       getPatientsData();
     });
   };
-
+  const er_confirmation = (rowDataItem, answer) => {
+    axiosPost(
+      "http://localhost/hospital-managment-system/backend/api/patients/crud.php",
+      "er_confirmation",
+      "patient_id",
+      rowDataItem.patient_id,
+      answer
+    ).then((res) => {
+      getPatientsData();
+    });
+  };
   const handleuserEdit = (rowDataItem) => {
     axiosPost(
       "http://localhost/hospital-managment-system/backend/api/users/crud.php",
@@ -136,7 +146,8 @@ const AdminDashboard = () => {
             onDelete={handlePatientDelete}
             onEdit={handlePatientEdit}
             onAdd={handlePatientAdd}
-            slice={2}
+            er_confirmation={er_confirmation}
+            slice={3}
           />
         )}
       </div>

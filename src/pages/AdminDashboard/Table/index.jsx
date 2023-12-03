@@ -1,7 +1,15 @@
 import React, { useState } from "react";
 import "./styles.css";
 
-const Table = ({ header_data, row_data, onDelete, onEdit, onAdd, slice }) => {
+const Table = ({
+  header_data,
+  row_data,
+  onDelete,
+  onEdit,
+  onAdd,
+  er_confirmation,
+  slice,
+}) => {
   const [editIndex, setEditIndex] = useState(-1);
   const [editedRow, setEditedRow] = useState({});
   const [showAddForm, setShowAddForm] = useState(false);
@@ -112,6 +120,24 @@ const Table = ({ header_data, row_data, onDelete, onEdit, onAdd, slice }) => {
                     >
                       Delete
                     </button>
+                    {rowDataItem.need_emergency ? (
+                      <div className="flex gap">
+                        <button
+                          className="btn "
+                          onClick={() => er_confirmation(rowDataItem, true)}
+                        >
+                          Accept ER
+                        </button>
+                        <button
+                          className="btn danger"
+                          onClick={() => er_confirmation(rowDataItem, false)}
+                        >
+                          Decline ER
+                        </button>
+                      </div>
+                    ) : (
+                      ""
+                    )}
                   </div>
                 )}
               </td>

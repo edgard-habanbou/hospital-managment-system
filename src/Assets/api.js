@@ -1,6 +1,12 @@
 import axios from "axios";
 
-export const axiosPost = (url, action, postDataName, postData) => {
+export const axiosPost = (
+  url,
+  action,
+  postDataName,
+  postData,
+  answer = false
+) => {
   return new Promise((resolve, reject) => {
     axios
       .post(
@@ -8,6 +14,7 @@ export const axiosPost = (url, action, postDataName, postData) => {
         {
           action: action,
           [postDataName]: postData,
+          answer: answer,
         },
         {
           headers: {

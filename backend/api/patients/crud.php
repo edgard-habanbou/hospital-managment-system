@@ -86,7 +86,7 @@ if ($data['action'] == 'delete') {
     echo json_encode($response);
 }
 if ($data['action'] == 'getAllPatients') {
-    $query = $con->prepare('SELECT pat.patient_id, pat.gender_id, pat.fname, pat.lname, pat.dob, pat.phone_number, gender.gender_name FROM `tbl_patient` pat JOIN `tbl_gender` gender ON pat.`gender_id` = gender.`gender_id`');
+    $query = $con->prepare('SELECT pat.patient_id, pat.gender_id, pat.need_emergency, pat.fname, pat.lname, pat.dob, pat.phone_number, gender.gender_name FROM `tbl_patient` pat JOIN `tbl_gender` gender ON pat.`gender_id` = gender.`gender_id`');
     $query->execute();
     $result = $query->get_result();
     $patients = [];
@@ -111,4 +111,24 @@ if ($data['action'] == 'getPatientById') {
     $response['message'] = 'Patient fetched successfully';
     header('Content-Type: application/json');
     echo json_encode($response);
+}
+if ($data['action'] == 'er_confirmation') {
+    $patient_id = $data['patient_id'];
+    if ($data['answer']) {
+        $query = $con->prepare('UPDATE tbl_patient SET need_emergency = 0, in_emergency_room = 1 WHERE patient_id = ?');
+        $query->bind_param('i', $patient_id);
+        $query->execute();
+        $response['status'] = true;
+        $response['message'] = 'Patient updated successfully';
+        header('Content-Type: application/json');
+        echo json_encode($response);
+    } else {
+        $query = $con->prepare('UPDATE tbl_patient SET need_emergency = 0, in_emergency_room = 0 WHERE patient_id = ?');
+        $query->bind_param('i', $patient_id);
+        $query->execute();
+        $response['status'] = true;
+        $response['message'] = 'Patient updated successfully';
+        header('Content-Type: application/json');
+        echo json_encode($response);
+    }
 }
