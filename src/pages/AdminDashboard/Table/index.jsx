@@ -47,17 +47,24 @@ const Table = ({ header_data, row_data, onDelete, onEdit, onAdd, slice }) => {
       <table className="table">
         <thead>
           <tr>
-            {header_data.map((item, index) => (
-              <th key={index} className="col-control">
-                {item}
-              </th>
-            ))}
+            {showAddForm && header_data.includes("Password") && (
+              <th>Password</th>
+            )}
+            {header_data
+              .slice(header_data.includes("Password") ? 1 : 0)
+              .map((item, index) => (
+                <th key={index} className="col-control">
+                  {item}
+                </th>
+              ))}
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {row_data.map((rowDataItem, rowIndex) => (
             <tr key={rowIndex}>
+              {showAddForm && header_data.includes("Password") && <td></td>}
+
               {Object.entries(rowDataItem)
                 .slice(slice)
                 .map(([key, value], colIndex) => (
@@ -113,7 +120,12 @@ const Table = ({ header_data, row_data, onDelete, onEdit, onAdd, slice }) => {
           {showAddForm && (
             <tr>
               {Object.keys(row_data[0])
-                .slice(slice)
+
+                .slice(
+                  showAddForm && header_data.includes("Password")
+                    ? slice - 1
+                    : slice
+                )
                 .map((key, colIndex) => (
                   <td key={colIndex}>
                     <input

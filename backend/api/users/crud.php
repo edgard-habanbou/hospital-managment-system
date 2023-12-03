@@ -15,16 +15,35 @@ include('../../config/connection.php');
 
 $json_data = file_get_contents("php://input");
 $data = json_decode($json_data, true);
-// if (isset($_SESSION) && $_SESSION['role_id'] == 1) {
-
+function hashPasswordIfNeeded($password)
+{
+    if (substr($password, 0, 4) === '$2y$') {
+        return $password;
+    } else {
+        // Password is not hashed, so hash it
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+        return $hashedPassword;
+    }
+}
 
 if ($data['action'] == "create") {
     $username = $data['data']['username'];
     $fname = $data['data']['fname'];
     $lname =  $data['data']['lname'];
     $role_id = $data['data']['role_id'];
+    $role_name = $data['data']['role_name'];
+    if (strtolower($role_name) == 'admin') {
+        $role_id = 1;
+    } else {
+        $role_id = 2;
+    }
     $user_email = $data['data']['user_email'];
-    $gender_id = $data['data']['gender_id'];
+    $gender_name = $data['data']['gender_name'];
+    if ($gender_name == 'Male') {
+        $gender_id = 1;
+    } else {
+        $gender_id = 2;
+    }
     $user_password = $data['data']['user_password'];
     $hashed_password = password_hash($user_password, PASSWORD_DEFAULT);
     $query = $con->prepare('INSERT INTO tbl_users (username, fname, lname, role_id, user_email, gender_id, user_password) VALUES (?, ?, ?, ?, ?, ?, ?)');
@@ -60,7 +79,7 @@ if ($data['action'] == 'update') {
     $user_password = $data['data']['user_password'];
     $user_id = $data['data']['user_id'];
 
-    $hashed_password = password_hash($user_password, PASSWORD_DEFAULT);
+    $hashed_password = hashPasswordIfNeeded($user_password);
     $query = $con->prepare('UPDATE tbl_users SET username = ?, fname = ?, lname = ?, role_id = ?, user_email = ?,  gender_id = ?, user_password = ? WHERE user_id = ?');
     $query->bind_param('sssisisi', $username, $fname, $lname, $role_id, $user_email,  $gender_id, $hashed_password, $user_id);
     $query->execute();
@@ -112,7 +131,7 @@ if ($data['action'] == 'getAllUsers') {
         }
         $response['status'] = true;
         $response['message'] = 'Users fetched successfully';
-        $response['header_data'] = ["Username", "First Name", "Last Name", "Email", "Role", "Gender"];
+        $response['header_data'] = ["Password", "Username", "First Name", "Last Name", "Email", "Role", "Gender"];
         $response['users'] = $users;
         header('Content-Type: application/json');
         echo json_encode($response);
@@ -141,9 +160,3 @@ if ($data['action'] == 'getUserById') {
         echo json_encode($response);
     }
 }
-// } else {
-//     $response['status'] = false;
-//     $response['message'] = 'You are not authorized to perform this action';
-//     header('Content-Type: application/json');
-//     echo json_encode($response);
-// }
