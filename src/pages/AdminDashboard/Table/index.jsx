@@ -36,15 +36,11 @@ const Table = ({ header_data, row_data, onDelete, onEdit, onAdd, slice }) => {
   };
 
   const handleAddSaveClick = () => {
-    // Add validation if needed
     const updatedRowData = [newRow];
     onAdd(updatedRowData[0]);
     setNewRow({});
     setShowAddForm(false);
-    // Pass the updated data to the parent component or handle it as needed
   };
-
-  const handleAddCancelClick = () => {};
 
   return (
     <div className="table-wrapper">

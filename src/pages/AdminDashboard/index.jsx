@@ -73,6 +73,26 @@ const AdminDashboard = () => {
       getDoctorsData();
     });
   };
+  const handleDoctorsAdd = (rowDataItem) => {
+    axiosPost(
+      "http://localhost/hospital-managment-system/backend/api/users/crud.php",
+      "create",
+      "data",
+      rowDataItem
+    ).then((res) => {
+      getDoctorsData();
+    });
+  };
+  const handlePatientAdd = (rowDataItem) => {
+    axiosPost(
+      "http://localhost/hospital-managment-system/backend/api/patients/crud.php",
+      "create",
+      "data",
+      rowDataItem
+    ).then((res) => {
+      getPatientsData();
+    });
+  };
 
   const handlePatientEdit = (rowDataItem) => {
     axiosPost(
@@ -105,6 +125,7 @@ const AdminDashboard = () => {
             row_data={doctorsData.users}
             onDelete={handleUserDelete}
             onEdit={handleuserEdit}
+            onAdd={handleDoctorsAdd}
             slice={4}
           />
         )}
@@ -114,6 +135,7 @@ const AdminDashboard = () => {
             row_data={PatientsData.patients}
             onDelete={handlePatientDelete}
             onEdit={handlePatientEdit}
+            onAdd={handlePatientAdd}
             slice={2}
           />
         )}

@@ -21,7 +21,12 @@ if ($data['action'] == "create") {
     $fname = $data['data']['fname'];
     $lname =  $data['data']['lname'];
     $dob = $data['data']['dob'];
-    $gender_id = $data['data']['gender_id'];
+    $gender_name = $data['data']['gender_name'];
+    if (strtolower($gender_name) == 'male') {
+        $gender_id = 1;
+    } else {
+        $gender_id = 2;
+    }
     $phone_number = $data['data']['phone_number'];
     $query = $con->prepare('INSERT INTO tbl_patient (fname, lname, dob, gender_id, phone_number) VALUES (?, ?, ?, ?, ?)');
     $query->bind_param('sssii', $fname, $lname, $dob, $gender_id, $phone_number);
