@@ -6,7 +6,7 @@
   margin-top: 20px;
 }
 .table-wrapper {
-  margin: 0 20vw;
+  margin: 0 10vw;
 }
 
 th {
@@ -37,5 +37,5 @@ tr:hover {
   color: white;
 }
 .col-control {
-  width: 200px;
+  /* width: 200px; */
 }

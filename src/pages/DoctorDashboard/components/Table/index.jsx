@@ -1,13 +1,22 @@
 import { useEffect, useState } from "react";
 import Record from "../Records";
+import { axiosPost } from "../../../../Assets/api";
 
 const Table = ({ patientsData, slice }) => {
   const [showRecords, setShowRecords] = useState(false);
   const [rowDataItem, setrowDataItem] = useState(null);
+  const API_BASE_URL = "http://localhost/hospital-managment-system/backend/api";
 
+  const RECORDS_API_URL = `${API_BASE_URL}/records/crud.php`;
   const handleShowRecords = (rowDataItem) => {
     setShowRecords(true);
     setrowDataItem(rowDataItem);
+  };
+  const addRecord = (newRecord) => {
+    console.log(newRecord);
+    axiosPost(RECORDS_API_URL, "create", "data", newRecord).then((response) => {
+      console.log(response);
+    });
   };
 
   useEffect(() => {
@@ -52,7 +61,11 @@ const Table = ({ patientsData, slice }) => {
         </table>
       </div>
       <div>
-        {showRecords && rowDataItem ? <Record rowDataItem={rowDataItem} /> : ""}
+        {showRecords && rowDataItem ? (
+          <Record rowDataItem={rowDataItem} onAdd={addRecord} />
+        ) : (
+          ""
+        )}
       </div>
     </div>
   );

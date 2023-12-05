@@ -120,7 +120,8 @@ if ($data['action'] == 'delete') {
     }
 }
 if ($data['action'] == 'getAllUsers') {
-    $query = $con->prepare('SELECT  user.`user_id`, role.`role_id`, gender.`gender_id`, user.`user_password`, user.`username`, user.`fname`, user.`lname`, user.`user_email`, role.`role_name`, gender.`gender_name` FROM tbl_users user JOIN tbl_roles role ON user.`role_id` = role.`role_id` JOIN tbl_gender gender ON user.`gender_id` = gender.`gender_id`;');
+
+    $query = $con->prepare('SELECT user.`user_id`, role.`role_id`, gender.`gender_id`, user.`username`, user.`fname`, user.`lname`, user.`user_email`, role.`role_name`, gender.`gender_name` FROM tbl_users user JOIN tbl_roles role ON user.`role_id` = role.`role_id` JOIN tbl_gender gender ON user.`gender_id` = gender.`gender_id`;');
     $query->execute();
 
     if ($query->error) {
