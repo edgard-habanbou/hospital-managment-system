@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import Nav from "./components/Nav";
 import Table from "./components/Table";
-import Calendars from "./components/Calendar";
 import { axiosPost } from "../../Assets/api";
+import AppointmentCalendar from "./components/AppointmentCalendar";
 
 const DoctorDashboard = () => {
   if (!localStorage.getItem("jwt")) {
@@ -14,6 +14,7 @@ const DoctorDashboard = () => {
   const [showCalendar, setShowCalendar] = useState(true);
   const [showPatients, setShowPatients] = useState(false);
   const [patientsData, setPatientsData] = useState(null);
+  const [user_id, setUser_id] = useState();
   const [showDoctorDashboard, setShowDoctorDashboard] = useState(false);
 
   const onCalendarClick = () => {
@@ -50,6 +51,7 @@ const DoctorDashboard = () => {
         localStorage.removeItem("jwt");
         window.location.href = "/";
       } else {
+        setUser_id(res.data.user_id);
         setShowDoctorDashboard(true);
       }
     });
@@ -66,7 +68,7 @@ const DoctorDashboard = () => {
         onCalendarClick={onCalendarClick}
         onPatientsClick={onPatientsClick}
       />
-      {showCalendar && <Calendars />}
+      {showCalendar && <AppointmentCalendar user_id={user_id} />}
       {showPatients && <Table patientsData={patientsData} slice={4} />}
     </div>
   ) : (

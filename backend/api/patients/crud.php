@@ -37,6 +37,7 @@ if ($data['action'] == "checkIfDoctor") {
     $response = [];
     $response['status'] = true;
     $response['message'] = 'User is Doctor';
+    $response['user_id'] = $decoded->user_id;
     header('Content-Type: application/json');
     echo json_encode($response);
 }
