@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Nav from "./components/Nav";
 import Table from "./components/Table";
-import Calendar from "./components/Calendar";
+import Calendars from "./components/Calendar";
 import { axiosPost } from "../../Assets/api";
 
 const DoctorDashboard = () => {
@@ -66,7 +66,7 @@ const DoctorDashboard = () => {
         onCalendarClick={onCalendarClick}
         onPatientsClick={onPatientsClick}
       />
-      {showCalendar && <Calendar />}
+      {showCalendar && <Calendars />}
       {showPatients && <Table patientsData={patientsData} slice={4} />}
     </div>
   ) : (
