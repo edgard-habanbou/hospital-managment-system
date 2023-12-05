@@ -1,6 +1,21 @@
 <?php
+
 include_once('../jwt_auth/auth.php');
 include('../../config/connection.php');
+require_once('../../../vendor/autoload.php');
+
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+
+$jwt = null;
+$headers = apache_request_headers();
+if (isset($headers['Authorization'])) {
+    $matches = [];
+    if (preg_match('/Bearer\s(\S+)/', $headers['Authorization'], $matches)) {
+        $jwt = $matches[1];
+    }
+}
+$decoded = JWT::decode($jwt, new key($secret_Key, 'HS512'));
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     $response = [];
@@ -24,8 +39,24 @@ function hashPasswordIfNeeded($password)
         return $hashedPassword;
     }
 }
-
+if ($data['action'] == "checkIfAdmin") {
+    if ($decoded->role_id != 1) {
+        http_response_code(401);
+        echo json_encode(array("message" => "Unauthorized Access"));
+        exit;
+    }
+    $response = [];
+    $response['status'] = true;
+    $response['message'] = 'User is admin';
+    header('Content-Type: application/json');
+    echo json_encode($response);
+}
 if ($data['action'] == "create") {
+    if ($decoded->role_id != 1) {
+        http_response_code(401);
+        echo json_encode(array("message" => "Unauthorized Access"));
+        exit;
+    }
     $username = $data['data']['username'];
     $fname = $data['data']['fname'];
     $lname =  $data['data']['lname'];
@@ -63,6 +94,11 @@ if ($data['action'] == "create") {
     }
 }
 if ($data['action'] == 'update') {
+    if ($decoded->role_id != 1) {
+        http_response_code(401);
+        echo json_encode(array("message" => "Unauthorized Access"));
+        exit;
+    }
     $username = $data['data']['username'];
     $fname = $data['data']['fname'];
     $lname =  $data['data']['lname'];
@@ -80,12 +116,11 @@ if ($data['action'] == 'update') {
     } else {
         $gender_id = 2;
     }
-    $user_password = $data['data']['user_password'];
     $user_id = $data['data']['user_id'];
 
-    $hashed_password = hashPasswordIfNeeded($user_password);
-    $query = $con->prepare('UPDATE tbl_users SET username = ?, fname = ?, lname = ?, role_id = ?, user_email = ?,  gender_id = ?, user_password = ? WHERE user_id = ?');
-    $query->bind_param('sssisisi', $username, $fname, $lname, $role_id, $user_email,  $gender_id, $hashed_password, $user_id);
+    $query = $con->prepare('UPDATE tbl_users SET username = ?, fname = ?, lname = ?, role_id = ?, user_email = ?,  gender_id = ? WHERE user_id = ?');
+    $query->bind_param('sssisii', $username, $fname, $lname, $role_id, $user_email,  $gender_id, $user_id);
+
     $query->execute();
     if ($query->error) {
         $response['status'] = false;
@@ -100,6 +135,11 @@ if ($data['action'] == 'update') {
     }
 }
 if ($data['action'] == 'delete') {
+    if ($decoded->role_id != 1) {
+        http_response_code(401);
+        echo json_encode(array("message" => "Unauthorized Access"));
+        exit;
+    }
     $user_id = $data['user_id'];
     $query = $con->prepare('DELETE FROM tbl_users WHERE user_id = ?');
     $query->bind_param('i', $user_id);

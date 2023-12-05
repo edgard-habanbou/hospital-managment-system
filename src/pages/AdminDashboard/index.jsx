@@ -12,6 +12,7 @@ const AdminDashboard = () => {
   const [doctorsData, setDoctorsData] = useState(null);
   const [showPatientsTable, setShowPatientsTable] = useState(false);
   const [patientsData, setPatientsData] = useState(null);
+  const [showAdminDashboard, setShowAdminDashboard] = useState(false);
 
   const handleDoctorsClick = () => {
     setShowDoctorsTable(true);
@@ -104,10 +105,28 @@ const AdminDashboard = () => {
       getPatientsData();
     });
   };
+
+  const checkIfAdmin = () => {
+    axiosPost(
+      USERS_API_URL,
+      "checkIfAdmin",
+      "jwt",
+      localStorage.getItem("jwt")
+    ).then((res) => {
+      if (res.status === false) {
+        localStorage.removeItem("jwt");
+        window.location.href = "/";
+      } else {
+        setShowAdminDashboard(true);
+      }
+    });
+  };
+  checkIfAdmin();
   useEffect(() => {
     document.title = "Admin Dashboard";
   }, []);
-  return (
+
+  return showAdminDashboard ? (
     <div>
       <Nav
         onDoctorsClick={handleDoctorsClick}
@@ -129,7 +148,7 @@ const AdminDashboard = () => {
             onDelete={handleUserDelete}
             onEdit={handleuserEdit}
             onAdd={handleDoctorsAdd}
-            slice={4}
+            slice={3}
           />
         )}
         {showPatientsTable && patientsData && (
@@ -146,7 +165,7 @@ const AdminDashboard = () => {
         )}
       </div>
     </div>
-  );
+  ) : null;
 };
 
 export default AdminDashboard;

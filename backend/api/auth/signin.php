@@ -39,7 +39,7 @@ if ($num_rows == 0) {
             'nbf'  => $date->getTimestamp(),
             'exp'  => $date->modify('+8 hours')->getTimestamp(),
             'user_id' => $user_id,
-            'user_role' => $role_id,
+            'role_id' => $role_id,
         ];
 
         $jwt = JWT::encode($request_data, $secret_Key, 'HS512');

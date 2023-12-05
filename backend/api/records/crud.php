@@ -1,7 +1,25 @@
 <?php
 include_once('../jwt_auth/auth.php');
 include('../../config/connection.php');
+require_once('../../../vendor/autoload.php');
 
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+
+$jwt = null;
+$headers = apache_request_headers();
+if (isset($headers['Authorization'])) {
+    $matches = [];
+    if (preg_match('/Bearer\s(\S+)/', $headers['Authorization'], $matches)) {
+        $jwt = $matches[1];
+    }
+}
+$decoded = JWT::decode($jwt, new key($secret_Key, 'HS512'));
+if ($decoded->role_id != 2) {
+    http_response_code(401);
+    echo json_encode(array("message" => "Unauthorized Access"));
+    exit;
+}
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     $response = [];
     $response['status'] = false;

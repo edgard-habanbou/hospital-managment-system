@@ -2,6 +2,20 @@
 
 include_once('../jwt_auth/auth.php');
 include('../../config/connection.php');
+require_once('../../../vendor/autoload.php');
+
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+
+$jwt = null;
+$headers = apache_request_headers();
+if (isset($headers['Authorization'])) {
+    $matches = [];
+    if (preg_match('/Bearer\s(\S+)/', $headers['Authorization'], $matches)) {
+        $jwt = $matches[1];
+    }
+}
+$decoded = JWT::decode($jwt, new key($secret_Key, 'HS512'));
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     $response = [];
@@ -14,7 +28,18 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $json_data = file_get_contents("php://input");
 $data = json_decode($json_data, true);
 
-
+if ($data['action'] == "checkIfDoctor") {
+    if ($decoded->role_id != 2) {
+        http_response_code(401);
+        echo json_encode(array("message" => "Unauthorized Access"));
+        exit;
+    }
+    $response = [];
+    $response['status'] = true;
+    $response['message'] = 'User is Doctor';
+    header('Content-Type: application/json');
+    echo json_encode($response);
+}
 if ($data['action'] == "create") {
     $fname = $data['data']['fname'];
     $lname =  $data['data']['lname'];

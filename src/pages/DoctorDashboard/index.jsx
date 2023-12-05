@@ -14,15 +14,19 @@ const DoctorDashboard = () => {
   const [showCalendar, setShowCalendar] = useState(true);
   const [showPatients, setShowPatients] = useState(false);
   const [patientsData, setPatientsData] = useState(null);
+  const [showDoctorDashboard, setShowDoctorDashboard] = useState(false);
+
   const onCalendarClick = () => {
     setShowCalendar(true);
     setShowPatients(false);
   };
+
   const onPatientsClick = () => {
     setShowPatients(true);
     setShowCalendar(false);
     getAllPatients();
   };
+
   const getAllPatients = () => {
     fetchData(PATIENTS_API_URL, "getAllPatients", null, setPatientsData);
   };
@@ -34,11 +38,29 @@ const DoctorDashboard = () => {
       })
       .catch((err) => console.log(err));
   };
+
+  const checkIfDoctor = () => {
+    axiosPost(
+      PATIENTS_API_URL,
+      "checkIfDoctor",
+      "jwt",
+      localStorage.getItem("jwt")
+    ).then((res) => {
+      if (res.status === false) {
+        localStorage.removeItem("jwt");
+        window.location.href = "/";
+      } else {
+        setShowDoctorDashboard(true);
+      }
+    });
+  };
+  checkIfDoctor();
+
   useEffect(() => {
     document.title = "Doctor Dashboard";
   }, []);
 
-  return (
+  return showDoctorDashboard ? (
     <div>
       <Nav
         onCalendarClick={onCalendarClick}
@@ -47,6 +69,8 @@ const DoctorDashboard = () => {
       {showCalendar && <Calendar />}
       {showPatients && <Table patientsData={patientsData} slice={3} />}
     </div>
+  ) : (
+    <div></div>
   );
 };
 
