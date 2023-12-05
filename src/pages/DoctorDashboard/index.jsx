@@ -67,7 +67,7 @@ const DoctorDashboard = () => {
         onPatientsClick={onPatientsClick}
       />
       {showCalendar && <Calendar />}
-      {showPatients && <Table patientsData={patientsData} slice={3} />}
+      {showPatients && <Table patientsData={patientsData} slice={4} />}
     </div>
   ) : (
     <div></div>

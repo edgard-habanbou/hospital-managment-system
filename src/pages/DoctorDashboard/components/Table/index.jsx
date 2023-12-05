@@ -8,17 +8,27 @@ const Table = ({ patientsData, slice }) => {
   const API_BASE_URL = "http://localhost/hospital-managment-system/backend/api";
 
   const RECORDS_API_URL = `${API_BASE_URL}/records/crud.php`;
+  const PATIENTS_API_URL = `${API_BASE_URL}/patients/crud.php`;
   const handleShowRecords = (rowDataItem) => {
     setShowRecords(true);
     setrowDataItem(rowDataItem);
   };
   const addRecord = (newRecord) => {
-    console.log(newRecord);
-    axiosPost(RECORDS_API_URL, "create", "data", newRecord).then((response) => {
-      console.log(response);
+    axiosPost(RECORDS_API_URL, "create", "data", newRecord).then(
+      (response) => {}
+    );
+  };
+  const handleNeedER = (rowDataItem) => {
+    console.log(rowDataItem);
+    axiosPost(
+      PATIENTS_API_URL,
+      "need_er",
+      "patient_id",
+      rowDataItem.patient_id
+    ).then((response) => {
+      alert(response.data.message);
     });
   };
-
   useEffect(() => {
     document.title = "Patients";
   }, []);
@@ -48,12 +58,31 @@ const Table = ({ patientsData, slice }) => {
                     </td>
                   ))}
                 <td>
-                  <button
-                    className="btn"
-                    onClick={() => handleShowRecords(rowDataItem)}
-                  >
-                    Show Records
-                  </button>
+                  <div className="flex gap">
+                    <div>
+                      <button
+                        className="btn"
+                        onClick={() => handleShowRecords(rowDataItem)}
+                      >
+                        Show Records
+                      </button>
+                    </div>
+                    <div>
+                      {!rowDataItem.need_emergency &&
+                      !rowDataItem.in_emergency_room ? (
+                        <button
+                          className="btn danger"
+                          onClick={() => handleNeedER(rowDataItem)}
+                        >
+                          Needs ER
+                        </button>
+                      ) : rowDataItem.need_emergency ? (
+                        <p>Already Requested</p>
+                      ) : (
+                        <p>In Emergency Room</p>
+                      )}
+                    </div>
+                  </div>
                 </td>
               </tr>
             ))}

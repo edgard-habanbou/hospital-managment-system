@@ -112,7 +112,13 @@ const Table = ({
                           }
                         >
                           {room_data.map((room, index) => (
-                            <option key={index} value={room.room_number}>
+                            <option
+                              key={index}
+                              value={room.room_number}
+                              {...(room.room_number === 0
+                                ? { disabled: true }
+                                : {})}
+                            >
                               {room.room_number}
                             </option>
                           ))}

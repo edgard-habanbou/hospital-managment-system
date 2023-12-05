@@ -41,6 +41,11 @@ if ($data['action'] == "checkIfDoctor") {
     echo json_encode($response);
 }
 if ($data['action'] == "create") {
+    if ($decoded->role_id != 1) {
+        http_response_code(401);
+        echo json_encode(array("message" => "Unauthorized Access"));
+        exit;
+    }
     $fname = $data['data']['fname'];
     $lname =  $data['data']['lname'];
     $dob = $data['data']['dob'];
@@ -53,11 +58,13 @@ if ($data['action'] == "create") {
     }
     $phone_number = $data['data']['phone_number'];
     $query = $con->prepare('INSERT INTO tbl_patient (fname, lname, dob, gender_id, phone_number,patient_room ) VALUES (?, ?, ?, ?, ?, ?)');
-    $query_room = $con->prepare('UPDATE `tbl_rooms` SET `availability_status` = 0 WHERE `tbl_rooms`.`room_number` = ?;');
-    $query_room->bind_param('i',  $patient_room);
     $query->bind_param('sssiii', $fname, $lname, $dob, $gender_id, $phone_number, $patient_room);
     $query->execute();
-    $query_room->execute();
+    if ($patient_room != 0) {
+        $query_room = $con->prepare('UPDATE `tbl_rooms` SET `availability_status` = 0 WHERE `tbl_rooms`.`room_number` = ?;');
+        $query_room->bind_param('i',  $patient_room);
+        $query_room->execute();
+    }
 
     $response = [];
 
@@ -74,12 +81,17 @@ if ($data['action'] == "create") {
     }
 }
 if ($data['action'] == 'update') {
+    if ($decoded->role_id != 1) {
+        http_response_code(401);
+        echo json_encode(array("message" => "Unauthorized Access"));
+        exit;
+    }
     $fname = $data['data']['fname'];
     $lname =  $data['data']['lname'];
     $dob = $data['data']['dob'];
     $gender_id = $data['data']['gender_id'];
     $gender_name = $data['data']['gender_name'];
-    $patient_room = $data['data']['patient_room'];
+    echo  $patient_room = $data['data']['patient_room'];
     if ($gender_name == 'Male') {
         $gender_id = 1;
     } else {
@@ -87,12 +99,30 @@ if ($data['action'] == 'update') {
     }
     $phone_number = $data['data']['phone_number'];
     $patient_id = $data['data']['patient_id'];
+
+    // Get room number
+    $query = $con->prepare('SELECT patient_room  FROM tbl_patient WHERE patient_id = ?');
+    $query->bind_param('i', $patient_id);
+    $query->execute();
+    $result = $query->get_result();
+    $patient = $result->fetch_assoc();
+    $patient_ex_room = $patient['patient_room'];
+
+    // Update room availability
+    if ($patient_ex_room != $patient_room) {
+        $query_room = $con->prepare('UPDATE `tbl_rooms` SET `availability_status` = 1 WHERE `tbl_rooms`.`room_number` = ?;');
+        $query_room->bind_param('i',  $patient_ex_room);
+        $query_room->execute();
+    }
+
     $query = $con->prepare('UPDATE tbl_patient SET  fname = ?, lname = ?, dob = ?, gender_id = ?, phone_number = ?, patient_room = ? WHERE patient_id = ?');
-    $query_room = $con->prepare('UPDATE `tbl_rooms` SET `availability_status` = 0 WHERE `tbl_rooms`.`room_number` = ?;');
-    $query_room->bind_param('i',  $patient_room);
     $query->bind_param('sssiiis', $fname, $lname, $dob, $gender_id, $phone_number, $patient_room,  $patient_id);
     $query->execute();
-    $query_room->execute();
+    if ($patient_room != 0) {
+        $query_room = $con->prepare('UPDATE `tbl_rooms` SET `availability_status` = 0 WHERE `tbl_rooms`.`room_number` = ?;');
+        $query_room->bind_param('i',  $patient_room);
+        $query_room->execute();
+    }
     if ($query->error) {
         $response['status'] = false;
         $response['message'] = 'Error updating user: ' . $query->error;
@@ -106,6 +136,12 @@ if ($data['action'] == 'update') {
     }
 }
 if ($data['action'] == 'delete') {
+    // Check if user is admin
+    if ($decoded->role_id != 1) {
+        http_response_code(401);
+        echo json_encode(array("message" => "Unauthorized Access"));
+        exit;
+    }
     $patient_id = $data['patient_id'];
     $query = $con->prepare('DELETE FROM tbl_patient WHERE patient_id = ?');
     $query->bind_param('i', $patient_id);
@@ -117,7 +153,7 @@ if ($data['action'] == 'delete') {
     echo json_encode($response);
 }
 if ($data['action'] == 'getAllPatients') {
-    $query = $con->prepare('SELECT pat.patient_id, pat.gender_id, pat.need_emergency, pat.fname, pat.lname, pat.dob, pat.phone_number,pat.patient_room, gender.gender_name FROM `tbl_patient` pat JOIN `tbl_gender` gender ON pat.`gender_id` = gender.`gender_id`');
+    $query = $con->prepare('SELECT pat.patient_id, pat.gender_id, pat.need_emergency, pat.in_emergency_room, pat.fname, pat.lname, pat.dob, pat.phone_number,pat.patient_room, gender.gender_name FROM `tbl_patient` pat JOIN `tbl_gender` gender ON pat.`gender_id` = gender.`gender_id`');
     $query_rooms = $con->prepare('SELECT * FROM tbl_rooms WHERE availability_status = 1');
     $query->execute();
     $result = $query->get_result();
@@ -154,7 +190,22 @@ if ($data['action'] == 'getPatientById') {
 if ($data['action'] == 'er_confirmation') {
     $patient_id = $data['patient_id'];
     if ($data['answer']) {
-        $query = $con->prepare('UPDATE tbl_patient SET need_emergency = 0, in_emergency_room = 1 WHERE patient_id = ?');
+
+        // Ger room number
+        $query = $con->prepare('SELECT patient_room  FROM tbl_patient WHERE patient_id = ?');
+        $query->bind_param('i', $patient_id);
+        $query->execute();
+        $result = $query->get_result();
+        $patient = $result->fetch_assoc();
+        $room_number = $patient['patient_room'];
+
+        // Update room availability
+        $query = $con->prepare('update tbl_rooms set availability_status = 1 where room_number = ?');
+        $query->bind_param('i', $room_number);
+        $query->execute();
+
+        // Update patient
+        $query = $con->prepare('UPDATE tbl_patient SET need_emergency = 0, in_emergency_room = 1, patient_room = 0 WHERE patient_id = ?');
         $query->bind_param('i', $patient_id);
         $query->execute();
         $response['status'] = true;
@@ -170,4 +221,14 @@ if ($data['action'] == 'er_confirmation') {
         header('Content-Type: application/json');
         echo json_encode($response);
     }
+}
+if ($data['action'] == 'need_er') {
+    $patient_id = $data['patient_id'];
+    $query = $con->prepare('UPDATE tbl_patient SET need_emergency = 1 WHERE patient_id = ?');
+    $query->bind_param('i', $patient_id);
+    $query->execute();
+    $response['status'] = true;
+    $response['message'] = 'Patient updated successfully';
+    header('Content-Type: application/json');
+    echo json_encode($response);
 }

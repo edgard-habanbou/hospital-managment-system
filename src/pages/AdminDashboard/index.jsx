@@ -160,7 +160,7 @@ const AdminDashboard = () => {
             onEdit={handlePatientEdit}
             onAdd={handlePatientAdd}
             er_confirmation={er_confirmation}
-            slice={3}
+            slice={4}
           />
         )}
       </div>
