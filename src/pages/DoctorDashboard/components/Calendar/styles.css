@@ -1,5 +1,4 @@
 :root {
-  --numDays: 5;
   --numHours: 10;
   --timeHeight: 60px;
   --calBgColor: #fff1f8;
@@ -135,6 +134,8 @@
 }
 
 .calendar-wrapper {
+  margin: 0 20px;
+  overflow-y: hidden;
   font-family: system-ui, sans-serif;
 }
 
