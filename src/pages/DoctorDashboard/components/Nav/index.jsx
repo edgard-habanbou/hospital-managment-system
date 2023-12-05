@@ -1,6 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
 const Nav = ({ onCalendarClick, onPatientsClick }) => {
+  const logout = () => {
+    localStorage.removeItem("jwt");
+  };
   return (
     <nav className="navbar">
       <ul className="nav-list flex row space-between">
@@ -18,7 +21,9 @@ const Nav = ({ onCalendarClick, onPatientsClick }) => {
         </div>
         <div>
           <li className="nav-item danger">
-            <Link to="/">Logout</Link>
+            <Link to="/" onClick={logout}>
+              Logout
+            </Link>
           </li>
         </div>
       </ul>

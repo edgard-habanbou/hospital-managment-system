@@ -27,6 +27,8 @@ const Login = () => {
         return response.data;
       })
       .then((data) => {
+        const jwt = data.jwt;
+        localStorage.setItem("jwt", jwt);
         if (data.status === "Login Success") {
           if (data.role_id === 1) {
             window.location.href = "/admin-dashboard";

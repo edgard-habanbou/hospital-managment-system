@@ -7,6 +7,8 @@ export const axiosPost = (
   postData,
   answer = false
 ) => {
+  const jwt = localStorage.getItem("jwt");
+
   return new Promise((resolve, reject) => {
     axios
       .post(
@@ -19,6 +21,7 @@ export const axiosPost = (
         {
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${jwt}`,
           },
         }
       )
@@ -26,8 +29,11 @@ export const axiosPost = (
         resolve(response);
       })
       .catch((error) => {
-        console.log(error);
-        reject(error);
+        if (error.response && error.response.status === 401) {
+          window.location.href = "/";
+        } else {
+          reject(error);
+        }
       });
   });
 };

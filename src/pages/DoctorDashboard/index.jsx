@@ -5,6 +5,9 @@ import Calendar from "./components/Calendar";
 import { axiosPost } from "../../Assets/api";
 
 const DoctorDashboard = () => {
+  if (!localStorage.getItem("jwt")) {
+    window.location.href = "/";
+  }
   const API_BASE_URL = "http://localhost/hospital-managment-system/backend/api";
   const PATIENTS_API_URL = `${API_BASE_URL}/patients/crud.php`;
 

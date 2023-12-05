@@ -1,5 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
+use Firebase\JWT\JWT;
+
+require_once('../../../vendor/autoload.php');
 
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: Content-Type');
@@ -25,18 +30,22 @@ if ($num_rows == 0) {
 } else {
 
     if (password_verify($user_password, $hashed_password)) {
-        session_start();
-        $_SESSION['user_id'] = $user_id;
-        $_SESSION['fname'] = $fname;
-        $_SESSION['lname'] = $lname;
-        $_SESSION['role_id'] = $role_id;
 
+        $secret_Key  = 'Q2FuJ3Qgd2FpdCB0byBmaW5pc2ggdGhpcyBwcm9ncmFtLg==';
+        $date   = new DateTimeImmutable();
+        $request_data = [
+            'iat'  => $date->getTimestamp(),
+            'iss'  => "http://localhost:3000",
+            'nbf'  => $date->getTimestamp(),
+            'exp'  => $date->modify('+8 hours')->getTimestamp(),
+            'user_id' => $user_id,
+            'user_role' => $role_id,
+        ];
 
+        $jwt = JWT::encode($request_data, $secret_Key, 'HS512');
+        $response['jwt'] = $jwt;
         $response['status']  = 'Login Success';
         $response['role_id'] = $role_id;
-        $response['fname'] = $fname;
-        $response['lname'] = $lname;
-        $response['user_id'] = $user_id;
 
         header('Content-Type: application/json');
         echo json_encode($response);

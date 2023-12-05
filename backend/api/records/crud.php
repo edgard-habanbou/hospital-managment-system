@@ -1,6 +1,6 @@
 <?php
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Headers: Content-Type');
+include_once('../jwt_auth/auth.php');
+include('../../config/connection.php');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     $response = [];
@@ -11,7 +11,6 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-include('../../config/connection.php');
 
 $json_data = file_get_contents("php://input");
 $data = json_decode($json_data, true);
