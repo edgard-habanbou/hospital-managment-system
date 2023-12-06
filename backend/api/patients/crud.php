@@ -144,6 +144,10 @@ if ($data['action'] == 'delete') {
         exit;
     }
     $patient_id = $data['patient_id'];
+    $query = $con->prepare('DELETE FROM tbl_appointments WHERE patient_id = ?');
+    $query->bind_param('i', $patient_id);
+    $query->execute();
+
     $query = $con->prepare('DELETE FROM tbl_patient WHERE patient_id = ?');
     $query->bind_param('i', $patient_id);
     $query->execute();

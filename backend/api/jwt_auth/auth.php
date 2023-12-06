@@ -27,3 +27,4 @@ try {
     echo json_encode(array("message" => "Unauthorized Access"));
     exit;
 }
+// make a function 

@@ -87,12 +87,12 @@ const AppointmentCalendar = ({ user_id }) => {
     });
   };
   useEffect(() => {
-    handleDateChange(new Date());
     const getPatients = () => {
       axiosPost(PATIENTS_API_URL, "getAllPatients").then((response) => {
         setPatients(response.data.patients);
       });
     };
+    handleDateChange(new Date());
     getPatients();
     getAppointments();
   }, [PATIENTS_API_URL]);
